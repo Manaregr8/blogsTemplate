@@ -9,6 +9,9 @@ const baseState = {
   title: "",
   slug: "",
   coverImg: "",
+  ogImage: "",
+  metaTitle: "",
+  metaDescription: "",
   tags: "",
   content: "",
 };
@@ -32,6 +35,9 @@ const BlogForm = ({ initialData = null, mode = "create" }) => {
     ...initialData,
     tags: initialData?.tags?.join(", ") || initialData?.tags || "",
     content: initialData?.content || "",
+    ogImage: initialData?.ogImage || "",
+    metaTitle: initialData?.metaTitle || "",
+    metaDescription: initialData?.metaDescription || "",
   }));
   const [slugTouched, setSlugTouched] = useState(Boolean(initialData?.slug));
   const [status, setStatus] = useState({ type: null, message: "" });
@@ -100,6 +106,9 @@ const BlogForm = ({ initialData = null, mode = "create" }) => {
         title: formValues.title.trim(),
         slug: formValues.slug.trim() || clientSlugify(formValues.title),
         coverImg: formValues.coverImg?.trim() || "",
+        ogImage: formValues.ogImage?.trim() || "",
+        metaTitle: formValues.metaTitle?.trim() || "",
+        metaDescription: formValues.metaDescription?.trim() || "",
         tags: formValues.tags,
         content: formValues.content,
       };
@@ -171,6 +180,32 @@ const BlogForm = ({ initialData = null, mode = "create" }) => {
         </label>
 
         <label>
+          Meta Title (SEO)
+          <input
+            type="text"
+            name="metaTitle"
+            placeholder="50-60 characters recommended"
+            maxLength="60"
+            value={formValues.metaTitle}
+            onChange={(event) => setField("metaTitle", event.target.value)}
+          />
+          <small>Optimized title for search engines (50-60 chars). If empty, uses the main title.</small>
+        </label>
+
+        <label>
+          Meta Description (SEO)
+          <textarea
+            name="metaDescription"
+            placeholder="150-160 characters recommended"
+            maxLength="160"
+            rows="3"
+            value={formValues.metaDescription}
+            onChange={(event) => setField("metaDescription", event.target.value)}
+          />
+          <small>Brief summary for search results and social media (150-160 chars).</small>
+        </label>
+
+        <label>
           Tags
           <input
             type="text"
@@ -192,6 +227,18 @@ const BlogForm = ({ initialData = null, mode = "create" }) => {
             value={formValues.coverImg}
             onChange={(event) => setField("coverImg", event.target.value)}
           />
+        </label>
+
+        <label>
+          OG Image URL (Social Sharing)
+          <input
+            type="text"
+            name="ogImage"
+            placeholder="https://"
+            value={formValues.ogImage}
+            onChange={(event) => setField("ogImage", event.target.value)}
+          />
+          <small>Specific image for social media previews. If empty, uses cover image.</small>
         </label>
 
         <label>

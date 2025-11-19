@@ -42,24 +42,54 @@ export async function generateMetadata(props) {
   }
 
   const baseUrl = await getBaseUrl();
-  const description = blog.content.replace(/<[^>]+>/g, " ").slice(0, 150);
-  const isExternalCover = Boolean(blog.coverImg && /^(https?:)?\/\//i.test(blog.coverImg));
-  const image = blog.coverImg
-    ? isExternalCover
-      ? blog.coverImg
-      : new URL(blog.coverImg, baseUrl).toString()
+  
+  // Use metaTitle if available, otherwise use title
+  const metaTitle = blog.metaTitle?.trim() || blog.title;
+  
+  // Use metaDescription if available, otherwise extract from content
+  const metaDescription = blog.metaDescription?.trim() || 
+    blog.content.replace(/<[^>]+>/g, " ").trim().slice(0, 160);
+  
+  // Use ogImage if available, otherwise use coverImg
+  const imageUrl = blog.ogImage?.trim() || blog.coverImg?.trim();
+  const isExternalImage = Boolean(imageUrl && /^(https?:)?\/\//i.test(imageUrl));
+  const ogImage = imageUrl
+    ? isExternalImage
+      ? imageUrl
+      : new URL(imageUrl, baseUrl).toString()
     : undefined;
+  
   const canonical = new URL(`/blog/${blog.slug}`, baseUrl).toString();
+  
+  // Generate image alt text
+  const imageAlt = `Cover image for ${blog.title}`;
 
   return {
-    title: blog.title,
-    description,
+    title: metaTitle,
+    description: metaDescription,
     openGraph: {
-      title: blog.title,
-      description,
-      images: image ? [image] : undefined,
+      title: metaTitle,
+      description: metaDescription,
+      images: ogImage ? [
+        {
+          url: ogImage,
+          alt: imageAlt,
+        }
+      ] : undefined,
       type: "article",
       url: canonical,
+      siteName: "Blogcode",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: metaTitle,
+      description: metaDescription,
+      images: ogImage ? [
+        {
+          url: ogImage,
+          alt: imageAlt,
+        }
+      ] : undefined,
     },
     alternates: { canonical },
   };

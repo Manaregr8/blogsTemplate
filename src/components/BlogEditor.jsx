@@ -45,6 +45,31 @@ const controls = [
     command: (editor) => editor.chain().focus().toggleOrderedList().run(),
     isActive: (editor) => editor.isActive("orderedList"),
   },
+  {
+    label: "🔗",
+    command: (editor) => {
+      const previousUrl = editor.getAttributes("link").href;
+      const url = window.prompt("URL:", previousUrl);
+      
+      if (url === null) {
+        return;
+      }
+      
+      if (url === "") {
+        editor.chain().focus().extendMarkRange("link").unsetLink().run();
+        return;
+      }
+      
+      // Ensure URL is absolute - if it doesn't start with http:// or https://, add https://
+      let formattedUrl = url.trim();
+      if (formattedUrl && !formattedUrl.match(/^https?:\/\//i)) {
+        formattedUrl = 'https://' + formattedUrl;
+      }
+      
+      editor.chain().focus().extendMarkRange("link").setLink({ href: formattedUrl }).run();
+    },
+    isActive: (editor) => editor.isActive("link"),
+  },
 ];
 
 const BlogEditor = ({ value, onChange }) => {
